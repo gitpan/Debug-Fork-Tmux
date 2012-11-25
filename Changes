@@ -1,5 +1,52 @@
 Changelog for Debug-Fork-Tmux
 
+v1.000006 2012-11-23T12:21:03
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Added GitHub page link
+
+ - Ticket: 76 (f80aff98-37f9-41a4-aae3-088c5475a3d2)
+   
+   More links in the 'Support' section
+   
+     - Changes in Support section of weaver.ini;
+   
+     - More content in the module built;
+
+
+v1.000005 2012-11-20T15:51:59
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - id: 82 (03eb37ec-a0d9-4563-8d84-a3ac0464d9e7)
+   
+   summary: disable versions' report in HTML:
+   
+     - No versions shouldn't be regenerated on every build;
+   
+     - tidy up HTML for Docs/, too.
+
+
+v1.000004 2012-11-20T09:51:59
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Ticket: 87 (ecc4ad40-c3f0-41d6-9ced-80ca3d508023)
+   
+   Test::Version seems to be missing from prereqs.  Some of the tests
+   require Test::Version:
+   
+     t/10-use.t 	    (Wstat: 256 Tests: 46 Failed: 1)
+       Failed test:  40
+       Non-zero exit status: 1
+     t/30-tmux.t	    (Wstat: 0 Tests: 1 Failed: 0)
+       Parse errors: Bad plan.	You planned 0 tests but ran 1.
+     Files=7, Tests=114,  2 wallclock secs ( 0.03 usr  0.09 sys +  1.13
+   cusr  1.36 csys =  2.61 CPU)
+   
+     It was observed that the test suite seem to fail without these
+   modules:
+   
+       Test::Version
+   
+   Plan for t/30-tmux.t 'skip_all' should be fixed, too.
+
+
 v1.000003 2012-11-19T14:38:23
  [Peter Vereshagin <peter@vereshagin.org>]
  - Ticket: 69 (f6be26b2-2de0-4905-889a-47e16120efa1)
@@ -91,27 +138,16 @@ v1.000001 2012-11-16T19:12:09
    They should stay.
 
 
-1.000004 2012-11-20T09:57:58
+1.000007 2012-11-25T14:03:51
  [Peter Vereshagin <peter@vereshagin.org>]
- - Ticket: 87 (ecc4ad40-c3f0-41d6-9ced-80ca3d508023)
+ - Perl6::Slurp unmet dependency for an author test
    
-   Test::Version seems to be missing from prereqs.  Some of the tests
-   require Test::Version:
+   Perl6::Slurp is required for 'xt/author/10-mkdn-no-backslashes.t' test.
+   Added dependensy to:
    
-     t/10-use.t 	    (Wstat: 256 Tests: 46 Failed: 1)
-       Failed test:  40
-       Non-zero exit status: 1
-     t/30-tmux.t	    (Wstat: 0 Tests: 1 Failed: 0)
-       Parse errors: Bad plan.	You planned 0 tests but ran 1.
-     Files=7, Tests=114,  2 wallclock secs ( 0.03 usr  0.09 sys +  1.13
-   cusr  1.36 csys =  2.61 CPU)
+     - Makefile.PL
    
-     It was observed that the test suite seem to fail without these
-   modules:
-   
-       Test::Version
-   
-   Plan for t/30-tmux.t 'skip_all' should be fixed, too.
+     - Build.PL
 
 
 v1.000000 2012-11-13T17:11:03
