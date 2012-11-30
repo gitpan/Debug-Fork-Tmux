@@ -14,7 +14,7 @@ package Debug::Fork::Tmux::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.000007';    # VERSION
+our $VERSION = '1.000009';    # VERSION
 #
 ### MODULES ###
 #
@@ -115,7 +115,7 @@ Debug::Fork::Tmux::Config - Configuration system for Debug::Fork::Tmux
 
 =head1 VERSION
 
-This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000007.
+This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000009.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,22 @@
 Changelog for Debug-Fork-Tmux
 
+v1.000008 2012-11-30T06:31:27
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Better description for POD
+
+
+v1.000007 2012-11-25T13:53:43
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Perl6::Slurp unmet dependency for an author test
+   
+   Perl6::Slurp is required for 'xt/author/10-mkdn-no-backslashes.t' test.
+   Added dependensy to:
+   
+     - Makefile.PL
+   
+     - Build.PL
+
+
 v1.000006 2012-11-23T12:21:03
  [Peter Vereshagin <peter@vereshagin.org>]
  - Added GitHub page link
@@ -138,16 +155,14 @@ v1.000001 2012-11-16T19:12:09
    They should stay.
 
 
-1.000007 2012-11-25T14:03:51
+1.000009 2012-11-30T11:33:36
  [Peter Vereshagin <peter@vereshagin.org>]
- - Perl6::Slurp unmet dependency for an author test
+ - Carp croaking without '.' on an end
    
-   Perl6::Slurp is required for 'xt/author/10-mkdn-no-backslashes.t' test.
-   Added dependensy to:
+   Carp::croak()'s message with a '.' at the end should be understanded in
+   t/20-cmd.t
    
-     - Makefile.PL
-   
-     - Build.PL
+   Thanks: Richard Foley <richard.foley@rfi.net>
 
 
 v1.000000 2012-11-13T17:11:03
