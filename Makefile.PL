@@ -1,3 +1,5 @@
+use lib 'inc';
+use Devel::AssertOS qw[Unix];
 
 use strict;
 use warnings;
@@ -12,11 +14,9 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Makes fork() in debugger to open a new Tmux window",
   "AUTHOR" => "L<Peter Vereshagin|http://vereshagin.org> <peter\@vereshagin.org>",
   "BUILD_REQUIRES" => {
-    "Config" => 0,
     "File::Find" => 0,
     "File::Temp" => 0,
     "Module::Build" => "0.3601",
-    "Perl6::Slurp" => 0,
     "Scalar::Util" => 0,
     "Sort::Versions" => 0,
     "Sub::Name" => 0,
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "Test::Most" => 0,
     "Test::Strict" => 0,
-    "Test::Version" => 0,
+    "Test::Version" => "1.002",
     "autodie" => 0
   },
   "CONFIGURE_REQUIRES" => {
@@ -36,13 +36,16 @@ my %WriteMakefileArgs = (
   "NAME" => "Debug::Fork::Tmux",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Config" => 0,
     "Const::Fast" => 0,
     "Cwd" => 0,
+    "Env::Path" => 0,
+    "File::Basename" => 0,
     "File::Spec" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.000009",
+  "VERSION" => "1.000012",
   "test" => {
     "TESTS" => "t/*.t"
   }

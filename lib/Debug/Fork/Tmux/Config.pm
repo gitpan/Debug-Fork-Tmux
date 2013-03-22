@@ -1,7 +1,7 @@
 #
 # This file is part of Debug-Fork-Tmux
 #
-# This software is Copyright (c) 2012 by Peter Vereshagin.
+# This software is Copyright (c) 2013 by Peter Vereshagin.
 #
 # This is free software, licensed under:
 #
@@ -14,7 +14,7 @@ package Debug::Fork::Tmux::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.000009';    # VERSION
+our $VERSION = '1.000012';    # VERSION
 #
 ### MODULES ###
 #
@@ -30,29 +30,35 @@ use Carp;
 # Makes constants possible
 use Const::Fast;
 
+# Withholds the Perl interpreter path
+require Config;
+
+# Rips directory name from fully-qualified file name (fqfn)
+use File::Basename;
+
+# Reads PATH environment variable into the array
+use Env::Path;
+
 ### CONSTANTS ###
 #
+# Paths to search the 'tmux' binary
+# Depends   :   On 'PATH' environment variable
+const my @_DEFAULT_TMUX_PATHS => _default_tmux_path( Env::Path->PATH->List );
 
-# Default path to the 'tmux' binary
-# Requires  :   Cwd
-const my $_DEFAULT_TMUX_PATH => Cwd::realpath('/usr/local/bin');
-
-# Default 'tmux' binary fqdn
-# Depends   :   On $_DEFAULT_TMUX_PATH
-# Requires  :   File::Spec
-const my $_DEFAULT_TMUX_FQDN =>
-    File::Spec->catfile( $_DEFAULT_TMUX_PATH => 'tmux' );
+# Default 'tmux' binary fqfn
+const my $_DEFAULT_TMUX_FQFN =>
+    _default_tmux_fqfn( \@_DEFAULT_TMUX_PATHS => [ '' => '.exe' ], );
 
 # Keep the configuration variables
 my %_CONF;
 
 # Tmux file name with full path
-$_CONF{'tmux_fqdn'} = $_DEFAULT_TMUX_FQDN;
+$_CONF{'tmux_fqfn'} = $_DEFAULT_TMUX_FQFN;
 
 # Tmux 'neww' parameter for a system/shell command
 $_CONF{'tmux_cmd_neww_exec'} = 'sleep 1000000';
 
-# Tmux  'neww' command paraneters to be sprintf()'d with 'tmux_fqdn' and
+# Tmux  'neww' command paraneters to be sprintf()'d with 'tmux_fqfn' and
 # pushed after split by spaces the 'tmux_cmd_neww_exec' into list of
 # parameters
 $_CONF{'tmux_cmd_neww'} = "neww -P";
@@ -60,18 +66,19 @@ $_CONF{'tmux_cmd_neww'} = "neww -P";
 # Tmux command parameters to get a tty name
 $_CONF{'tmux_cmd_tty'} = 'lsp -F #{pane_tty} -t';
 
+# Takes deprecated SPUNGE_* environment variables into the account, too
+_env_to_conf(
+    \%_CONF => "SPUNGE_",
+    sub {
+        warn sprintf( "%s is deprecated and will be unsupported" => shift );
+    }
+);
+
 # Take config override from %ENV
 # Depends   :   On %ENV global of the main::
-foreach my $key ( keys %_CONF ) {
+_env_to_conf( \%_CONF => "DF" );
 
-    # Key for %ENV
-    my $env_key = "SPUNGE_" . uc $key;
-
-    next unless defined $ENV{$env_key};
-
-    $_CONF{$key} = $ENV{$env_key};
-}
-
+# Make configuration unchangeable
 const %_CONF => %_CONF;
 
 ### ATTRIBUTES ###
@@ -79,6 +86,95 @@ const %_CONF => %_CONF;
 
 ### SUBS ###
 #
+# Function
+# Reads environment to config
+# Takes     :   HashRef[Str] configuration to read;
+#               Str environment variables' prefix to read config from;
+#               Optional CodeRef to evaluate with environment variable name
+#               as an argument.
+# Depends   :   On configuration HashRef's keys and the corresponding
+#               environment variables
+# Changes   :   Configuration HashRef supplied as an argument
+# Outputs   :   From CodeRef if supplied to warn to STDOUT about SPUNGE_*
+#               deprecation
+# Returns   :   n/a
+sub _env_to_conf {
+    my $conf   = shift;
+    my $prefix = shift;
+    my $cref   = shift || undef;
+
+    foreach my $key ( keys %$conf ) {
+
+        # Key for %ENV
+        my $env_key = $prefix . uc $key;
+
+        # For no key in environment do nothing
+        next unless defined $ENV{$env_key};
+
+        # Sub warns about deprecation
+        if ( defined $cref ) { $cref->($env_key); }
+
+        # Real config change
+        $conf->{$key} = $ENV{$env_key};
+    }
+}
+
+# Function
+# Finds default 'tmux' binary fully qualified fila name
+# Takes     :   ArrayRef[Str] paths to search for 'tmux' binary
+#               ArrayRef[Str] suffixes of the binaries to search
+# Depends   :   On 'tmux' binaries found in the system
+# Requires  :   File::Spec module
+# Returns   :   Str fully qualified file name of the 'tmux' binary, or just
+#               'tmux' if no such binary was found
+sub _default_tmux_fqfn {
+    my ( $paths => $suffixes ) = @_;
+    my $fqfn;
+
+    foreach my $path (@$paths) {
+        my $fname;
+
+        # Binary without prefix
+        foreach my $suffix (@$suffixes) {
+            $fname = File::Spec->catfile( $path, "tmux$suffix" );
+            if ( -x $fname ) {
+                $fqfn = $fname;
+                last;    # foreach my $suffix
+            }
+        }
+
+        # Fall back if no binary found in the default paths
+        $fqfn = 'tmux' unless defined $fqfn;
+
+        last if defined $fqfn;    # foreach my @$paths
+    }
+
+    return $fqfn;
+}
+
+# Function
+# Paths to search the 'tmux' binary in
+# Takes     :   Array[Str] contents of the PATH environment variable
+# Depends   :   On the current directory and Perl interpreter path
+# Requires  :   Cwd, File::Basename, Config modules
+# Returns   :   Array[Str] ordered unique path to search for 'tmux' binary
+#               except that was configured with environment variable
+sub _default_tmux_path {
+    my @paths = @_;
+
+    # Additional paths to search for Tmux
+    my @paths_add
+        = map { Cwd::realpath($_) }
+        File::Basename::dirname( $Config::Config{'perlpath'} ),
+        '.';
+    push @paths, @paths_add;
+
+    # Filter out dupes
+    my %seen = ();
+    @paths = grep { !$seen{$_}++ } @paths;
+
+    return @paths;
+}
 
 # Static method
 # Returns Str argument configured as a key supplied as an argument
@@ -115,21 +211,24 @@ Debug::Fork::Tmux::Config - Configuration system for Debug::Fork::Tmux
 
 =head1 VERSION
 
-This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000009.
+This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000012.
 
 =head1 SYNOPSIS
 
     use Debug::Fork::Tmux;
 
-    my $tmux_fqdn = Debug::Fork::Tmux->config( 'tmux_fqdn' );
+    my $tmux_fqfn = Debug::Fork::Tmux->config( 'tmux_fqfn' );
 
 =head1 DESCRIPTION
 
 This module reads description from environment variables and use defaults if
 those are not set.
 
-For example C<tmux_fqdn> can be overridden with C<SPUNGE_TMUX_FQDN>
-variable, and so on..
+For example C<tmux_fqfn> can be overridden with C<DFTMUX_FQFN>
+variable, and so on.
+
+The C<SPUNGE_*> variables are supported yet but deprecated and will be
+removed.
 
 =head1 SUBROUTINES/METHODS
 
@@ -294,7 +393,7 @@ L<Peter Vereshagin|http://vereshagin.org> <peter@vereshagin.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Peter Vereshagin.
+This software is Copyright (c) 2013 by Peter Vereshagin.
 
 This is free software, licensed under:
 
@@ -317,6 +416,14 @@ L<Debug::Fork::Tmux::Config|Debug::Fork::Tmux::Config>
 =item *
 
 L<http://perlmonks.org/?node_id=128283|http://perlmonks.org/?node_id=128283>
+
+=item *
+
+L<nntp://nntp.perl.org/perl.debugger|nntp://nntp.perl.org/perl.debugger>
+
+=item *
+
+L<http://debugger.perl.org/|http://debugger.perl.org/>
 
 =back
 

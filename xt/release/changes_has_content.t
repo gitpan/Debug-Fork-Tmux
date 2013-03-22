@@ -2,7 +2,7 @@
 #
 # This file is part of Debug-Fork-Tmux
 #
-# This software is Copyright (c) 2012 by Peter Vereshagin.
+# This software is Copyright (c) 2013 by Peter Vereshagin.
 #
 # This is free software, licensed under:
 #
@@ -13,7 +13,7 @@ use Test::More tests => 2;
 
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver       = '1.000009';
+my $newver       = '1.000012';
 my $trial_token  = '-TRIAL';
 
 SKIP: {

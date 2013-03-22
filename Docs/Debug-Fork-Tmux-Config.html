@@ -104,6 +104,12 @@
 -->
     <!-- start doc -->
     <a name='___top' class='dummyTopAnchor'></a>
+    <h1>
+      Debug::Fork::Tmux::Config
+    </h1>
+    <p>
+      Configuration system for Debug::Fork::Tmux
+    </p>
     <div class='indexgroup'>
       <ul class='indexList indexList1'>
         <li class='indexItem indexItem1'>
@@ -187,59 +193,55 @@
         </li>
       </ul>
     </div>
-    <h1>
-      <a class='u' href='#___top' title='click to go to top of document'
-      name="NAME" id="NAME">NAME</a>
-    </h1>
-    <p>
-      Debug::Fork::Tmux::Config - Configuration system for
-      Debug::Fork::Tmux
-    </p>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="VERSION" id="VERSION">VERSION</a>
-    </h1>
+    </h2>
     <p>
       This documentation refers to the module contained in the distribution
-      <code>Debug-Fork-Tmux</code> version 1.000009.
+      <code>Debug-Fork-Tmux</code> version 1.000012.
     </p>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="SYNOPSIS" id="SYNOPSIS">SYNOPSIS</a>
-    </h1>
+    </h2>
     <pre>
     use Debug::Fork::Tmux;
 
-    my $tmux_fqdn = Debug::Fork::Tmux-&gt;config( 'tmux_fqdn' );
+    my $tmux_fqfn = Debug::Fork::Tmux-&gt;config( 'tmux_fqfn' );
 </pre>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="DESCRIPTION" id="DESCRIPTION">DESCRIPTION</a>
-    </h1>
+    </h2>
     <p>
       This module reads description from environment variables and use
       defaults if those are not set.
     </p>
     <p>
-      For example <code>tmux_fqdn</code> can be overridden with
-      <code>SPUNGE_TMUX_FQDN</code> variable, and so on..
+      For example <code>tmux_fqfn</code> can be overridden with
+      <code>DFTMUX_FQFN</code> variable, and so on.
     </p>
-    <h1>
-      <a class='u' href='#___top' title='click to go to top of document'
-      name="SUBROUTINES/METHODS">SUBROUTINES/METHODS</a>
-    </h1>
     <p>
-      All of the following are static methods:
+      The <code>SPUNGE_*</code> variables are supported yet but deprecated
+      and will be removed.
     </p>
     <h2>
       <a class='u' href='#___top' title='click to go to top of document'
-      name="PUBLIC" id="PUBLIC">PUBLIC</a>
+      name="SUBROUTINES/METHODS">SUBROUTINES/METHODS</a>
     </h2>
+    <p>
+      All of the following are static methods:
+    </p>
     <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="PUBLIC" id="PUBLIC">PUBLIC</a>
+    </h3>
+    <h4>
       <a class='u' href='#___top' title='click to go to top of document'
       name="get_config(_Str_the_name_of_the_option_)"><code>get_config( Str
       the name of the option )</code></a>
-    </h3>
+    </h4>
     <p>
       Retrieves configuration stored in an internal
       <code>Debug::Fork::Tmux::Config</code> constants.
@@ -247,33 +249,33 @@
     <p>
       Returns <code>Str</code> value of the configuration parameter.
     </p>
-    <h2>
-      <a class='u' href='#___top' title='click to go to top of document'
-      name="PRIVATE" id="PRIVATE">PRIVATE</a>
-    </h2>
     <h3>
       <a class='u' href='#___top' title='click to go to top of document'
-      name="get_all_config_keys()"><code>get_all_config_keys()</code></a>
+      name="PRIVATE" id="PRIVATE">PRIVATE</a>
     </h3>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="get_all_config_keys()"><code>get_all_config_keys()</code></a>
+    </h4>
     <p>
       Returns <code>Array[Str]</code> names of all the configuration
       parameters.
     </p>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="CONFIGURATION_AND_ENVIRONMENT" id=
       "CONFIGURATION_AND_ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a>
-    </h1>
+    </h2>
     <p>
       See <a href=
       "http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux#CONFIGURATION_AND_ENVIRONMENT"
       class="podlinkpod">"CONFIGURATION AND ENVIRONMENT" in
       Debug::Fork::Tmux</a>.
     </p>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="DIAGNOSTICS" id="DIAGNOSTICS">DIAGNOSTICS</a>
-    </h1>
+    </h2>
     <dl>
       <dt>
         <a name="Undefined_in_a_configuration:_&lt;key&gt;"><code>Undefined
@@ -285,35 +287,35 @@
         </p>
       </dd>
     </dl>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="BUGS_AND_LIMITATIONS" id="BUGS_AND_LIMITATIONS">BUGS AND
       LIMITATIONS</a>
-    </h1>
+    </h2>
     <p>
       You can make new bug reports, and view existing ones, through the web
       interface at <a href=
       "http://bugs.vereshagin.org/product/Debug-Fork-Tmux" class=
       "podlinkurl">http://bugs.vereshagin.org/product/Debug-Fork-Tmux</a>.
     </p>
-    <h1>
-      <a class='u' href='#___top' title='click to go to top of document'
-      name="SUPPORT" id="SUPPORT">SUPPORT</a>
-    </h1>
     <h2>
       <a class='u' href='#___top' title='click to go to top of document'
-      name="Perldoc" id="Perldoc">Perldoc</a>
+      name="SUPPORT" id="SUPPORT">SUPPORT</a>
     </h2>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Perldoc" id="Perldoc">Perldoc</a>
+    </h3>
     <p>
       You can find documentation for this module with the perldoc command.
     </p>
     <pre>
   perldoc Debug::Fork::Tmux
 </pre>
-    <h2>
+    <h3>
       <a class='u' href='#___top' title='click to go to top of document'
       name="Websites" id="Websites">Websites</a>
-    </h2>
+    </h3>
     <p>
       The following websites have more information about this module, and
       may be of help to you. As always, in addition to those websites
@@ -426,19 +428,19 @@
         </p>
       </li>
     </ul>
-    <h2>
+    <h3>
       <a class='u' href='#___top' title='click to go to top of document'
       name="Email" id="Email">Email</a>
-    </h2>
+    </h3>
     <p>
       You can email the author of this module at
       <code>peter@vereshagin.org</code> asking for help with any problems
       you have.
     </p>
-    <h2>
+    <h3>
       <a class='u' href='#___top' title='click to go to top of document'
       name="Bugs_/_Feature_Requests">Bugs / Feature Requests</a>
-    </h2>
+    </h3>
     <p>
       Please report any bugs or feature requests by email to
       <code>peter@vereshagin.org</code>, or through the web interface at
@@ -447,10 +449,10 @@
       You will be automatically notified of any progress on the request by
       the system.
     </p>
-    <h2>
+    <h3>
       <a class='u' href='#___top' title='click to go to top of document'
       name="Source_Code" id="Source_Code">Source Code</a>
-    </h2>
+    </h3>
     <p>
       The code is open to the world, and available for you to hack on.
       Please feel free to browse it and play with it, or whatever. If you
@@ -464,21 +466,21 @@
     <pre>
   git clone https://github.com/petr999/Debug-Fork-Tmux.git
 </pre>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="AUTHOR" id="AUTHOR">AUTHOR</a>
-    </h1>
+    </h2>
     <p>
       <a href="http://vereshagin.org" class="podlinkurl">Peter
       Vereshagin</a> &lt;peter@vereshagin.org&gt;
     </p>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="COPYRIGHT_AND_LICENSE" id="COPYRIGHT_AND_LICENSE">COPYRIGHT AND
       LICENSE</a>
-    </h1>
+    </h2>
     <p>
-      This software is Copyright (c) 2012 by Peter Vereshagin.
+      This software is Copyright (c) 2013 by Peter Vereshagin.
     </p>
     <p>
       This is free software, licensed under:
@@ -486,10 +488,10 @@
     <pre>
   The (three-clause) BSD License
 </pre>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="SEE_ALSO" id="SEE_ALSO">SEE ALSO</a>
-    </h1>
+    </h2>
     <p>
       Please see those modules/websites for more information related to
       this module.
@@ -508,12 +510,20 @@
         <a href="http://perlmonks.org/?node_id=128283" class=
         "podlinkurl">http://perlmonks.org/?node_id=128283</a>
       </li>
+      <li>
+        <a href="nntp://nntp.perl.org/perl.debugger" class=
+        "podlinkurl">nntp://nntp.perl.org/perl.debugger</a>
+      </li>
+      <li>
+        <a href="http://debugger.perl.org/" class=
+        "podlinkurl">http://debugger.perl.org/</a>
+      </li>
     </ul>
-    <h1>
+    <h2>
       <a class='u' href='#___top' title='click to go to top of document'
       name="DISCLAIMER_OF_WARRANTY" id="DISCLAIMER_OF_WARRANTY">DISCLAIMER
       OF WARRANTY</a>
-    </h1>
+    </h2>
     <p>
       BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO
       WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.

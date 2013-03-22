@@ -1,7 +1,7 @@
 #
 # This file is part of Debug-Fork-Tmux
 #
-# This software is Copyright (c) 2012 by Peter Vereshagin.
+# This software is Copyright (c) 2013 by Peter Vereshagin.
 #
 # This is free software, licensed under:
 #
@@ -14,7 +14,7 @@ package Debug::Fork::Tmux;
 use strict;
 use warnings;
 
-our $VERSION = '1.000009';    # VERSION
+our $VERSION = '1.000012';    # VERSION
 #
 ### MODULES ###
 #
@@ -72,12 +72,12 @@ sub _spawn_tty {
 # Function
 # Creates new 'tmux' window  and returns its id/number
 # Takes     :   n/a
-# Depends   :   On 'tmux_fqdn', 'tmux_neww', 'tmux_neww_exec' configuration
+# Depends   :   On 'tmux_fqfn', 'tmux_neww', 'tmux_neww_exec' configuration
 #               parameters
 # Returns   :   Str id/number of the created 'tmux' window
 sub _tmux_new_window {
     my @cmd_to_read = (
-        Debug::Fork::Tmux::Config->get_config('tmux_fqdn'),
+        Debug::Fork::Tmux::Config->get_config('tmux_fqfn'),
         split(
             /\s+/, Debug::Fork::Tmux::Config->get_config('tmux_cmd_neww')
         ),
@@ -92,14 +92,14 @@ sub _tmux_new_window {
 # Function
 # Gets a 'tty' name from 'tmux's window id/number
 # Takes     :   Str 'tmux' window id/number
-# Depends   :   On 'tmux_fqdn', 'tmux_cmd_tty' configuration parameters
+# Depends   :   On 'tmux_fqfn', 'tmux_cmd_tty' configuration parameters
 # Returns   :   Str 'tty' device name of the 'tmux' window
 sub _tmux_window_tty {
     my $window_id = shift;
 
     # Concatenate the 'tmux' command and read its output
     my @cmd_to_read = (
-        Debug::Fork::Tmux::Config->get_config('tmux_fqdn'),
+        Debug::Fork::Tmux::Config->get_config('tmux_fqfn'),
         split( /\s+/, Debug::Fork::Tmux::Config->get_config('tmux_cmd_tty') ),
         $window_id,
     );
@@ -200,13 +200,15 @@ Debug::Fork::Tmux - Makes fork() in debugger to open a new Tmux window
 
 =head1 VERSION
 
-This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000009.
+This documentation refers to the module contained in the distribution C<Debug-Fork-Tmux> version 1.000012.
 
 =head1 SYNOPSIS
 
     #!/usr/bin/perl -d
     #
     # ABSTRACT: Debug the fork()-contained code in this file
+    #
+    ## Works only under Tmux: http://tmux.sf.net
     #
     # Make fork()s debuggable with Tmux
     use Debug::Fork::Tmux;
@@ -216,7 +218,21 @@ This documentation refers to the module contained in the distribution C<Debug-Fo
 
 =head1 DESCRIPTION
 
-The real usage example of this module is:
+Make sure you have the running C<Tmux> window manager:
+
+    $ tmux
+
+=over
+
+=item * Only C<Tmux> version 1.6 and higher works with C<Debug::Fork::Tmux>.
+See L</DEPENDENCIES>.
+
+=item * It is not necessary to run this under C<Tmux>, see L</Attaching to
+the other C<Tmux> session>.
+
+=back
+
+Then the real usage example of this module is:
 
     $ perl -MDebug::Fork::Tmux -d your_script.pl
 
@@ -313,16 +329,37 @@ L<system()|perlfunc/system> command failure.
 The module requires the L<Tmux|http://tmux.sf.net> window manager for the
 console to be present in the system.
 
+This means that it requires the C<Unix>-like operating system not only to
+have a L<fork> implemented and a C<TTY> device name supplement but the
+system should have Tmux up and running.
+
+Therefore C<Cygwin> for example isn't in at this moment, see the
+L<explanation|http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/1354>
+why.
+
 Configuration is made via environment variables, the default is taken for
 each of them with no such variable is set in the environment:
 
-=head2 C<SPUNGE_TMUX_FQDN>
+=head2 C<DFTMUX_FQFN>
 
 The C<tmux> binary name with the full path.
 
-Default :   C</usr/local/bin/tmux>
+Default :   The first of those for executable to exist:
 
-=head2 C<SPUNGE_TMUX_CMD_NEWW>
+=over
+
+=item C<PATH> environment variable contents
+
+=item Path to the Perl binary interpreter
+
+=item Current directory
+
+=back
+
+and just the C<tmux> as a fallback if none of above is the location of the
+C<tmux> executable file.
+
+=head2 C<DFTMUX_CMD_NEWW>
 
 The L<system()|perlfunc/system> arguments for a C<tmux>
 command for opening a new window and with output of a window address from
@@ -330,16 +367,16 @@ C<tmux>. String is sliced by spaces to be a list of parameters.
 
 Default :  C<neww -P>
 
-=head2 C<SPUNGE_TMUX_CMD_NEWW_EXEC>
+=head2 C<DFTMUX_CMD_NEWW_EXEC>
 
 The L<system()|perlfunc/system> or a shell command to be given to the
-C<SPUNGE_TMUX_CMD_NEWW> command to be executed in a brand new created
+C<DFTMUX_CMD_NEWW> command to be executed in a brand new created
 window. It should wait unexpectedly and do nothing till the debugger
 catches the device and puts in into the proper use.
 
 Default :  C<sleep 1000000>
 
-=head2 C<SPUNGE_TMUX_CMD_TTY>
+=head2 C<DFTMUX_CMD_TTY>
 
 Command- line  parameter(s) for a  C<tmux> command to find a C<tty> name in
 the output. The string is sliced then by spaces. The C<tmux>'s window
@@ -347,42 +384,60 @@ address is added then as the very last argument.
 
 Default :  C<lsp -F #{pane_tty} -t>
 
+=head2 Earlier versions' C<SPUNGE_*> environment variables
+
+Till v1.000009 the module was controlled by the environment variables like
+C<SPUNGE_TMUX_FQDN>. Those are deprecated and should be replaced in your
+configuration(s) onto the C<DFTMUX_>-prefixed ones.
+
+=head2 Attaching to the other C<Tmux> session
+
+For the case you can not or don't want to use the current C<tmux> session
+you are running in, you may want to have the separate C<tmux> server up and
+running and use its windows or panes to be created. This can be done by mean
+of prepending the correct C<-L> or C<-S> switch to the start of the every of
+the command-line parameters string to be used, for example:
+
+    $ DFTMUX_CMD_NEWW="-L default neww -P" \
+    > DFTMUX_CMD_TTY="-L default lsp -F #{pane_tty} -t" \
+    > perl -MDebug::Fork::Tmux -d your_script.pl
+
 =head1 DIAGNOSTICS
 
 =over
 
-=item The command ...
+=item * C<The command ...>
 
 Typically the error message starts with the command the L<Debug::Fork::Tmux> tried
 to execute, including the command's arguments.
 
-=item failed opening command: ...
+=item * C<failed opening command: ...>
 
 The command was not taken by the system as an executable binary file.
 
-=item ... didn't write a line
+=item * C<... didn't write a line>
 
-=item failed reading command: ...
+=item * C<failed reading command: ...>
 
 Command did not output exactly one line of the text.
 
-=item ... did not finish
+=item * C<... did not finish>
 
 Command outputs more than one line of the text.
 
-=item provided empty string
+=item * C<provided empty string>
 
 Command outputs exactly one line of the text and the line is empty.
 
-=item failed to execute: ...
+=item * C<failed to execute: ...>
 
 There was failure executing the command
 
-=item child died with(out) signal X, Y coredump
+=item * C<child died with(out) signal X, Y coredump>
 
 Command was killed by the signal X and the coredump is (not) located in Y.
 
-=item child exited with value X
+=item * C<child exited with value X>
 
 Command was not failed but there are reasons to throw an error like the
 wrong command's output.
@@ -391,12 +446,12 @@ wrong command's output.
 
 =head1 DEPENDENCIES
 
-* C<Perl 5.6.0+>
+* C<Perl 5.8.9+>
 is available from L<The Perl website|http://www.perl.org>
 
 * L<Config>, L<Cwd>, L<DB>, L<ExtUtils::MakeMaker>, L<File::Find>,
-L<File::Spec> are available in core C<Perl> distribution version 5.6.0 and
-later
+L<File::Spec>, L<File::Basename>, L<Scalar::Util>, L<Test::More> are
+available in core C<Perl> distribution version 5.8.9 and later
 
 * L<Const::Fast>
 is available from C<CPAN>
@@ -404,22 +459,19 @@ is available from C<CPAN>
 * L<Module::Build>
 is available in core C<Perl> distribution since version 5.9.4
 
-* L<Scalar::Util>
-is available in core C<Perl> distribution since version 5.7.3
-
 * L<Sort::Versions>
 is available from C<CPAN>
 
 * L<Test::Exception>
 is available from C<CPAN>
 
-* L<Test::More>
-is available in core C<Perl> distribution since version 5.6.2
-
 * L<Test::Most>
 is available from C<CPAN>
 
 * L<Test::Strict>
+is available from C<CPAN>
+
+* L<Env::Path>
 is available from C<CPAN>
 
 * L<autodie>
@@ -570,7 +622,7 @@ L<Peter Vereshagin|http://vereshagin.org> <peter@vereshagin.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Peter Vereshagin.
+This software is Copyright (c) 2013 by Peter Vereshagin.
 
 This is free software, licensed under:
 
@@ -589,6 +641,14 @@ L<Debug::Fork::Tmux::Config|Debug::Fork::Tmux::Config>
 =item *
 
 L<http://perlmonks.org/?node_id=128283|http://perlmonks.org/?node_id=128283>
+
+=item *
+
+L<nntp://nntp.perl.org/perl.debugger|nntp://nntp.perl.org/perl.debugger>
+
+=item *
+
+L<http://debugger.perl.org/|http://debugger.perl.org/>
 
 =back
 
